@@ -1,0 +1,96 @@
+﻿@model GoSocial.Models.Posting
+@{
+    ViewData["Title"] = "New Campaign";
+    ViewData["Description"] = "Start a new advertising campaign, just provide us a few details below";
+}
+@section scripts{
+    $("#Country").change(function(){
+        var id = $(this).val();
+    $("#ddlState").empty();
+        $.get("GetStates", {countryId: id}, function(data){
+            $.each(data, function(){
+                $(document.createElement('option'))
+                    .attr('value', this.value)
+                    .text(this.text)
+                    .appendTo("#ddlState");
+                });
+        });
+    });
+    $("#ddlState").change(function(){
+        var id = $(this).val();
+    $("#ddlCity").empty();
+        $.get("GetCities", {stateId: id}, function(data){
+            $.each(data, function(){
+                $(document.createElement('option'))
+                    .attr('value', this.value)
+                    .text(this.text)
+                    .appendTo("#ddlCity");
+                });
+        });
+    });
+}
+    <form class="col-sm-8" asp-controller="Home" asp-action="AddCampaign">
+        <fieldset>
+            <legend>What is your industry?</legend>
+            <div class="form-group">
+                @await Component.InvokeAsync("IndustryList")
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>What is your campaign about?</legend>
+            <div class="form-group">
+                <label for="campaignTitle">Title</label>
+                <input type="text" class="form-control" id="campaignTitle" placeholder="campaign name" asp-for="Title">
+            </div>
+            <div class="form-group">
+                <label for="campaignDescription">Details about the campaign</label>
+                <textarea class="form-control" asp-for="Description" id="campaignDescription" placeholder="describe what you need for the campaign" rows="3"></textarea>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>What is your budget?</legend>
+            <div class="form-group">
+                <label for="campaignbudget">Set a budget</label>
+                <div class="input-group">
+                    <div class="input-group-addon">$</div>
+                    <input type="number" class="form-control" id="campaignbudget" placeholder="Amount (CAD)" asp-for="Price">
+                    <div class="input-group-addon">.00</div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>What is your campaign location?</legend>
+            <div class="form-group">
+                <label for="platform">Select Country</label>
+                @await Component.InvokeAsync("CountryList")
+            </div>
+            <div class="form-group">
+                <label for="ddlState">Select Province/State</label>
+                <select class="form-control" id="ddlState">
+                    <option>please select a country</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ddlCity">Select City</label>
+                <select class="form-control" id="ddlCity" asp-for="CityId">
+                    <option>please select a state/province</option>
+                </select>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>What do you require?</legend>
+            <div class="form-group">
+                <label for="platform">Select a platform</label>
+                @await Component.InvokeAsync("PlatformList")
+            </div>
+            <div class="form-group">
+                <label for="minFollowers">Minimum followers the influencer must have</label>
+                <input class="form-control" id="minFollowers" placeholder="followers required" asp-for="FollowersRequired" />
+            </div>
+        </fieldset>
+        <button type="submit" class="btn btn-primary">Submit Campaign</button>
+    </form>
+    <div class="col-sm-2">
+        s
+        <div style="clear:both"></div>
+    </div>

@@ -1,0 +1,135 @@
+﻿@model IEnumerable<GoSocial.Models.Posting>
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-signin-client_id" content="326566777429-p3k0d2cjmpcv1moa31hocoamt5ovvifn.apps.googleusercontent.com">
+    <title>@ViewData["Title"] - GoSocial</title>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <environment names="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment names="Staging,Production">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.6/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+    @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
+</head>
+<body>
+   
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">GoSocial</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="AddCampaign">Start Campaign</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                </ul>
+                @await Html.PartialAsync("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div id="HomePageBanner" class="row">
+        <div id="InnerBannerContainer" class="col-md-12">
+        </div>
+    </div>
+    <div class="container body-content">
+
+        <script>
+            function onSignIn(googleUser) {
+                var profile = googleUser.getBasicProfile();
+                console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+                console.log('Name: ' + profile.getName());
+                console.log('Image URL: ' + profile.getImageUrl());
+                console.log('Email: ' + profile.getEmail());
+            }
+        </script>
+        <div class="row">
+            <div class="col-md-10">
+                <h1>Campaign Postings</h1>
+            </div>
+            <div class="col-sm-2">
+                <h3><button type="button" class="btn-lg btn btn-primary"  data-toggle="modal" data-target="#myModal">Start Campaign</button></h3>
+            </div>
+        </div>
+        <div class="row">
+            @foreach (var posting in Model)
+            {
+                <div class="col-sm-12 Posting" data-toggle="collapse" data-parent="#accordion" href="#Collapse-@Html.DisplayFor(x => posting.Id)" aria-expanded="true">
+                    <div class="col-sm-7">
+                        <div class="row postingTitle">@Html.DisplayFor(x => posting.Title)</div>
+                        <div class="row">@Html.DisplayFor(x => posting.Description)</div>
+
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.DisplayFor(x => posting.City.City1)
+                    </div>
+                    <div class="col-sm-1">@Html.DisplayFor(x => posting.Date)</div>
+                    <div class="col-sm-1">@Html.DisplayFor(x => posting.Price)</div>
+
+                </div>
+                <div class="col-sm-12 panel-collapse collapse Details" id="Collapse-@Html.DisplayFor(x => posting.Id)" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="row">
+                        <div class="col-sm-6 text-center">
+                            <h4><b>@Html.DisplayFor(x => posting.Title)</b></h4>
+                        </div>
+                        <div class="col-sm-6 text-center"><h4><b>Contact Stuff</b></h4></div>
+                    </div>
+                    <div class="row PostingAdditionalDetails">
+                        <div class="col-sm-3"><h4>Platform</h4>@Html.DisplayFor(x => posting.PlatformId)</div>
+                        <div class="col-sm-3"><h4>Email</h4></div>
+                        <div class="col-sm-3"><h4>Posted</h4>@Html.DisplayFor(x => posting.Date)</div>
+                        <div class="col-sm-3"><h4>Followers</h4></div>
+                    </div>
+                    <div class="row PostingAdditionalDetails">
+                        <div class="col-sm-12"><h4>Description</h4>@Html.DisplayFor(x => posting.Description)</div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row">
+
+        </div>
+
+        <hr />
+        <footer>
+            <p>&copy; 2016 - GoSocial</p>
+        </footer>
+    </div>
+
+    <environment names="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.6/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+</body>
+</html>

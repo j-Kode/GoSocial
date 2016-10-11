@@ -1,0 +1,3 @@
+﻿@model IEnumerable<GoSocial.Models.Industry>
+
+@Html.DropDownList("IndustryId", new SelectList(Model.Select(x => new { Value = x.Id, Text = x.Industry1 }), "Value", "Text"), "select brand industry", new {@class="form-control"})
