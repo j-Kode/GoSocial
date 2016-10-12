@@ -51,7 +51,10 @@
     "Microsoft.EntityFrameworkCore.SqlServer.Design": "1.0.1",
     "System.ComponentModel.Annotations": "4.1.0",
     "Microsoft.AspNetCore.Identity": "1.0.0",
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0"
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0",
+    "Microsoft.AspNetCore.Authentication.Facebook": "1.0.0",
+    "Microsoft.AspNetCore.Authentication.Google": "1.0.0",
+    "Microsoft.AspNetCore.Authentication.Twitter": "1.0.0"
   },
 
   "tools": {

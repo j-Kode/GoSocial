@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using GoSocial.Data;
 using GoSocial.Models;
 using GoSocial.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GoSocial
 {
@@ -51,7 +52,10 @@ namespace GoSocial
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<GoSocialContext>()
                 .AddDefaultTokenProviders();
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new RequireHttpsAttribute());
+            });
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
@@ -82,6 +86,24 @@ namespace GoSocial
             app.UseStaticFiles();
 
             app.UseIdentity();
+
+            app.UseFacebookAuthentication(new FacebookOptions()
+            {
+                AppId = Configuration["Authentication:Facebook:AppId"],
+                AppSecret = Configuration["Authentication:Facebook:AppSecret"]
+            });
+
+            app.UseGoogleAuthentication(new GoogleOptions()
+            {
+                ClientId = Configuration["Authentication:Google:AppId"],
+                ClientSecret = Configuration["Authentication:Google:AppSecret"]
+            });
+
+            app.UseTwitterAuthentication(new TwitterOptions()
+            {
+                ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
+                ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"]
+            });
 
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
 

@@ -11,22 +11,24 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GoSocial.Controllers
 {
-    [Authorize]
+    
     public class HomeController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private GoSocialContext db;
+        
         public HomeController(GoSocialContext db)
         {
             this.db = db;
         }
-        public async Task<IActionResult> Index()
+        [Authorize]
+        public IActionResult Index()
         {
-            var user = await GetCurrentUserAsync();
-            if (user == null)
-            {
-                return View("Error");
-            }
+            //var user = await GetCurrentUserAsync();
+            //if (user == null)
+            //{
+            //    return View("Error");
+            //}
             return View(db.Posting.Include(c => c.City).ToList());
 
         }
@@ -48,7 +50,7 @@ namespace GoSocial.Controllers
         {
             return View();
         }
-
+        [Authorize]
         public IActionResult AddCampaign()
         {
             return View();
@@ -99,9 +101,9 @@ namespace GoSocial.Controllers
                 return Json(cities);
          
         }
-        private Task<ApplicationUser> GetCurrentUserAsync()
-        {
-            return _userManager.GetUserAsync(HttpContext.User);
-        }
+        //private Task<ApplicationUser> GetCurrentUserAsync()
+        //{
+        //    return _userManager.GetUserAsync(HttpContext.User);
+        //}
     }
 }
