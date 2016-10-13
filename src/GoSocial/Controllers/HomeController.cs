@@ -32,6 +32,11 @@ namespace GoSocial.Controllers
             return View(db.Posting.Include(c => c.City).ToList());
 
         }
+        [HttpGet]
+        public ActionResult Search(string term)
+        {
+            return Json(db.Platform.Where(p => p.Platform1.StartsWith(term, StringComparison.OrdinalIgnoreCase)).Select(p => p.Platform1).ToList());
+        }
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
