@@ -13,6 +13,7 @@ using GoSocial.Services;
 namespace GoSocial.Controllers
 {
     [Authorize]
+    [RequireHttps]
     public class ManageController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

@@ -54,8 +54,11 @@
     "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Facebook": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Google": "1.0.0",
-    "Microsoft.AspNetCore.Authentication.Twitter": "1.0.0"
-  },
+    "Microsoft.AspNetCore.Authentication.Twitter": "1.0.0",
+    "SendGrid.NetCore": "1.0.0-rtm-00002",
+    "MailKit": "1.8.1",
+    "Twilio": "5.0.0-rc8",
+    "AspNet.Security.OAuth.Instagram": "1.0.0-beta1-final"},
 
   "tools": {
     "BundlerMinifier.Core": "2.0.238",
