@@ -9,7 +9,7 @@ namespace GoSocial.Models.AccountViewModels
     public class LoginViewModel
     {
         [Required]
-        [EmailAddress]
+        [DataType(DataType.Text)]
         public string Email { get; set; }
 
         [Required]

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace GoSocial.Controllers
 {
@@ -16,26 +17,36 @@ namespace GoSocial.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private GoSocialContext db;
-        
-        public HomeController(GoSocialContext db)
+
+        public HomeController(
+            UserManager<ApplicationUser> userManager, GoSocialContext db)
         {
+            _userManager = userManager;
             this.db = db;
         }
+
         [Authorize]
-        public IActionResult Index()
+        public IActionResult Index(int IndustryId, int cityId)
         {
-            //var user = await GetCurrentUserAsync();
-            //if (user == null)
-            //{
-            //    return View("Error");
-            //}
-            return View(db.Posting.Include(c => c.City).ToList());
+            if (IndustryId != 0 && cityId != 0)
+            {
+                return View(db.Posting.Include(c => c.City).Include(u => u.User).Where(p=> p.IndustryId == IndustryId && p.CityId == cityId).ToList());
+            }
+            else
+            {
+                return View(db.Posting.Include(c => c.City).Include(u => u.User).ToList());
+            }
+
+            
 
         }
         [HttpGet]
         public ActionResult Search(string term)
         {
-            return Json(db.Platform.Where(p => p.Platform1.StartsWith(term, StringComparison.OrdinalIgnoreCase)).Select(p => p.Platform1).ToList());
+            var result = (from c in db.City join s in db.State
+                          on c.StateId equals s.Id where c.City1.StartsWith(term)
+                          select new { label = c.City1 + ", " + s.StateCode, value=c.Id }).Take(10).ToList();
+            return Json(result);
         }
         public IActionResult About()
         {
@@ -60,6 +71,23 @@ namespace GoSocial.Controllers
         {
             return View();
         }
+        public IActionResult SendMessage(Message message)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var user = db.Users.Where(u => u.UserName == message.ToUserId.Substring(1)).FirstOrDefault();
+                message.CreateDate = DateTime.UtcNow;
+                message.FromUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                message.ToUserId = user.Id;
+                message.StatusId = 1;
+                db.Message.Add(message);
+                db.SaveChangesAsync();
+                
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AddCampaign(Posting posting)
@@ -67,7 +95,7 @@ namespace GoSocial.Controllers
             if (ModelState.IsValid)
             {
                     posting.Date = DateTime.UtcNow;
-                    posting.UserId = 1; //Added 1 for userid, testing purpose.
+                    posting.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value; //Added 1 for userid, testing purpose.
                     db.Posting.Add(posting);
                     db.SaveChanges();
 

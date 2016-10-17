@@ -1,0 +1,9 @@
+﻿@model GoSocial.Models.MessageViewModels.IndexMessagesViewModel
+@{
+    ViewData["Title"] = "My Messages";
+}
+
+@foreach(var message in Model.Messages)
+{
+    @Html.DisplayFor(x => message.MessageSubject)
+}

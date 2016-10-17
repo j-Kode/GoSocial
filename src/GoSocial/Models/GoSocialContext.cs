@@ -14,12 +14,12 @@ namespace GoSocial.Models
         //    var config = builder.Build();
         //    optionsBuilder.UseSqlServer(config.GetConnectionString("DefaultConnection"));
         //}
-       
+
         public GoSocialContext(DbContextOptions<GoSocialContext> options)
             : base(options)
         {
         }
-        protected GoSocialContext()
+        public GoSocialContext()
         {
         }
 
@@ -332,7 +332,9 @@ namespace GoSocial.Models
 
                 entity.Property(e => e.Type).HasColumnName("type");
 
-                entity.Property(e => e.UserId).HasColumnName("userId");
+                entity.Property(e => e.UserId)
+                    .HasColumnName("userId")
+                    .HasColumnType("varchar(100)"); ;
 
                 entity.HasOne(d => d.City)
                     .WithMany(p => p.Posting)
@@ -393,6 +395,52 @@ namespace GoSocial.Models
                     .HasColumnName("userName")
                     .HasColumnType("varchar(100)");
             });
+            modelBuilder.Entity<MessageStatus>(entity =>
+            {
+                entity.ToTable("MessageState", "dbo");
+                entity.Property(e => e.StatusId).HasColumnName("id");
+                entity.Property(e => e.Status)
+                    .HasColumnName("state")
+                    .IsRequired().
+                    HasColumnType("varchar(50)");
+            });
+            modelBuilder.Entity<Message>(entity =>
+            {
+                entity.ToTable("Message", "dbo");
+                entity.Property(e => e.MessageId).HasColumnName("id");
+
+                entity.Property(e => e.FromUserId)
+                    .IsRequired()
+                    .HasColumnName("fromUserId")
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.ToUserId)
+                    .IsRequired()
+                    .HasColumnName("toUserId")
+                    .HasColumnType("varchar(100)");
+
+
+                entity.Property(e => e.MessageText)
+                    .IsRequired()
+                    .HasColumnName("message")
+                    .HasColumnType("varchar(1500)");
+
+                entity.Property(e => e.MessageSubject)
+                    .IsRequired()
+                    .HasColumnName("messageTitle")
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.CreateDate)
+                    .IsRequired()
+                    .HasColumnName("createDate")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.StatusId)
+                    .IsRequired()
+                    .HasColumnName("state");
+
+            });
+
 
         }
 
@@ -403,5 +451,7 @@ namespace GoSocial.Models
         public virtual DbSet<Posting> Posting { get; set; }
         public virtual DbSet<State> State { get; set; }
         public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<Message> Message { get; set; }
+        public virtual DbSet<MessageStatus> MessageStatus { get; set; }
     }
 }

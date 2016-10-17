@@ -6,7 +6,7 @@ namespace GoSocial.Models
     public partial class Posting
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public DateTime Date { get; set; }
         public int CityId { get; set; }
         public string Description { get; set; }
@@ -20,5 +20,6 @@ namespace GoSocial.Models
         public int IndustryId { get; set; }
 
         public virtual City City { get; set; }
+        public virtual ApplicationUser User { get; set; }
     }
 }

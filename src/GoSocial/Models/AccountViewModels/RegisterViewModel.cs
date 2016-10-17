@@ -9,6 +9,13 @@ namespace GoSocial.Models.AccountViewModels
     public class RegisterViewModel
     {
         [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+        [DataType(DataType.Text)]
+        [Display(Name = "Username")]
+        [RegularExpression("^[a-zA-Z0-9-_]$", ErrorMessage = "The {0} can only contain alphanumeric, hypens and underscores")]
+        public string Username { get; set; }
+
+        [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using GoSocial.Models;
 using GoSocial.Models.AccountViewModels;
 using GoSocial.Services;
+using GoSocial.Helpers;
 
 namespace GoSocial.Controllers
 {
@@ -59,7 +58,7 @@ namespace GoSocial.Controllers
             if (ModelState.IsValid)
             {
                 // Require the user to have a confirmed email before they can log on.
-                var user = await _userManager.FindByNameAsync(model.Email);
+                var user = await _userManager.FindByNameOrEmailAsync(model.Email);
                 if (user != null)
                 {
                     if (!await _userManager.IsEmailConfirmedAsync(user))
@@ -70,7 +69,7 @@ namespace GoSocial.Controllers
                 }
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
@@ -116,21 +115,27 @@ namespace GoSocial.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email };
+                var userWithSameEmail = _userManager.FindByEmailAsync(model.Email);
+                if (userWithSameEmail.Result == null)
                 {
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                    // Send an email with this link
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                    await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                        $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
-                    //await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation(3, "User created a new account with password.");
-                    return RedirectToLocal(returnUrl);
+                    var result = await _userManager.CreateAsync(user, model.Password);
+                    if (result.Succeeded)
+                    {
+                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+                        // Send an email with this link
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                        await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
+                            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                        //await _signInManager.SignInAsync(user, isPersistent: false);
+                        _logger.LogInformation(3, "User created a new account with password.");
+                        return RedirectToLocal(returnUrl);
+                    }
+                    AddErrors(result);
                 }
-                AddErrors(result);
+                else
+                    ModelState.AddModelError(string.Empty, "That email is already in use");
             }
 
             // If we got this far, something failed, redisplay form
@@ -219,18 +224,24 @@ namespace GoSocial.Controllers
                     return View("ExternalLoginFailure");
                 }
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
+                var userWithSameEmail = _userManager.FindByEmailAsync(model.Email);
+                if (userWithSameEmail.Result == null)
                 {
-                    result = await _userManager.AddLoginAsync(user, info);
+                    var result = await _userManager.CreateAsync(user);
                     if (result.Succeeded)
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation(6, "User created an account using {Name} provider.", info.LoginProvider);
-                        return RedirectToLocal(returnUrl);
+                        result = await _userManager.AddLoginAsync(user, info);
+                        if (result.Succeeded)
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            _logger.LogInformation(6, "User created an account using {Name} provider.", info.LoginProvider);
+                            return RedirectToLocal(returnUrl);
+                        }
                     }
+                    AddErrors(result);
                 }
-                AddErrors(result);
+                else
+                    ModelState.AddModelError(string.Empty, "That email is already in use");
             }
 
             ViewData["ReturnUrl"] = returnUrl;

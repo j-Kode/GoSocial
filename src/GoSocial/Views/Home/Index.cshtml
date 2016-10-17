@@ -58,6 +58,7 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="AddCampaign">Start Campaign</a></li>
+                    <li><a asp-area="" asp-controller="Message" asp-action="Index">Inbox</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                 </ul>
@@ -67,15 +68,19 @@
     </div>
     <div id="HomePageBanner">
         <div id="InnerBannerContainer" class="col-md-12 text-center">
-            <div id="postingSearch" class="form-inline">
-                <div class="form-group col-sm-5">
-                    @await Component.InvokeAsync("IndustryList")
+            @using (Html.BeginForm("Index", "Home"))
+            {
+                <div id="postingSearch" class="form-inline">
+                    <div class="form-group col-sm-5">
+                        @await Component.InvokeAsync("IndustryList")
+                    </div>
+                    <div id="locationResults" class="form-group col-sm-5">
+                        <input hidden type="text" id="locationSearchID" name="cityId" required />
+                        <input type="text" class="form-control" id="locationSearch" required placeholder="start typing your city...">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="float:left; height:40px">Search</button>
                 </div>
-                <div class="form-group col-sm-5">
-                    <input type="text" class="form-control" id="locationSearch" placeholder="start typing your city...">
-                </div>
-                <button type="submit" class="btn btn-primary" style="float:left; height:40px">Search</button>
-            </div>
+            }
         </div>
     </div>
     <div class="container body-content">
@@ -89,9 +94,36 @@
                 console.log('Email: ' + profile.getEmail());
             }
             $(document).ready(function () {
+                var items = [];
                 $('#locationSearch').autocomplete({
-                    source: '@Url.Action("Search","Home")'
+                    source: function (request, response) {
+                        $.ajax({
+                            url: "@Url.Action("Search","Home")",
+                            type: "GET",
+                            data: request,
+                            success: function (data) {
+                                response(data);
+                            }
+                        });
+                    },
+                    appendTo: $('#locationResults'),
+                    select: function (event, ui) {
+                        $('#locationSearch').val(ui.item.label);
+                        $('#locationSearchID').val(ui.item.value);
+                        return false;
+                    }
                 });
+            
+            $('#contactModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget) // Button that triggered the modal
+                var recipient = button.data('whatever') // Extract info from data-* attributes
+                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+                var modal = $(this)
+                modal.find('.modal-title').text('New message to ' + recipient)
+                modal.find('#recipient-name').val(recipient)
+                modal.find('#message-subject').val("Hey " + recipient)
+            });
             });
         </script>
         <div class="row">
@@ -99,7 +131,7 @@
                 <h1>Campaign Postings</h1>
             </div>
             <div class="col-sm-2">
-                <h3><button type="button" class="btn-lg btn btn-primary" data-toggle="modal" data-target="#myModal">Start Campaign</button></h3>
+                <h3><a href="./Home/AddCampaign" type="button" class="btn-lg btn btn-primary">Start Campaign</a></h3>
             </div>
         </div>
         <div class="row">
@@ -132,13 +164,14 @@
                         <div class="col-sm-3"><h4>Followers</h4></div>
                     </div>
                     <div class="row PostingAdditionalDetails">
-                        <div class="col-sm-12"><h4>Description</h4>@Html.DisplayFor(x => posting.Description)</div>
+                        <div class="col-sm-8"><h4>Description</h4>@Html.DisplayFor(x => posting.Description)</div>
+                        <div class="col-sm-4 text-right"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#contactModal" data-whatever="@@@Html.DisplayFor(x => posting.User.UserName)">Contact @@@Html.DisplayFor(x => posting.User.UserName)</button></div>
                     </div>
                 </div>
             }
         </div>
         <div class="row">
-
+            @Html.Partial("Modals")
         </div>
 
         <hr />
