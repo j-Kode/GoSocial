@@ -91,9 +91,12 @@ namespace GoSocial.Controllers
         }
 
         // GET: Message/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Message message)
         {
-            return View();
+            message.StatusId = 3; //Setting message state to deleted, maybe this shouldnt be hardcoded
+            db.Entry(message).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            db.SaveChanges();
+            return RedirectToAction("index");
         }
 
         // POST: Message/Delete/5

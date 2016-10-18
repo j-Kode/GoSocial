@@ -1,5 +1,6 @@
 ﻿using GoSocial.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +31,7 @@ namespace GoSocial.Helpers
             if(userId != null)
             {
 
-                    messages = (from m in db.Message
-                                    where m.ToUserId == userId
-                                    select m).ToList();
+                messages = db.Message.Include(u => u.FromUser).Where(m => m.ToUserId == userId && m.StatusId == 1).ToList();
                     
             }
             return messages;

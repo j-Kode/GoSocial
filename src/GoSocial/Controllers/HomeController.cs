@@ -82,7 +82,7 @@ namespace GoSocial.Controllers
                 message.ToUserId = user.Id;
                 message.StatusId = 1;
                 db.Message.Add(message);
-                db.SaveChangesAsync();
+                db.SaveChanges();
                 
                 return RedirectToAction("Index");
             }

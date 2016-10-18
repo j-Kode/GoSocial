@@ -16,6 +16,7 @@ namespace GoSocial.Models
         public int StatusId { get; set; }
         
         public virtual MessageStatus Status { get; set; }
-
+        public virtual ApplicationUser FromUser { get; set; }
+        public virtual ApplicationUser ToUser { get; set; }
     }
 }
