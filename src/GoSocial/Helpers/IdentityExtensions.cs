@@ -24,15 +24,43 @@ namespace GoSocial.Helpers
             }
             return await userManager.FindByNameAsync(username);
         }
-        public static List<Message> GetUserMessages (this UserManager<ApplicationUser> userManager, ApplicationUser user, GoSocialContext db)
+        public static async Task<ApplicationUser> UsernameInUse(this UserManager<ApplicationUser> userManager, string username)
+        {
+            return await userManager.FindByNameAsync(username);
+        }
+        public static IEnumerable<Message> GetUserMessages(this UserManager<ApplicationUser> userManager, ApplicationUser user, GoSocialContext db)
         {
             var userId = user.Id;
-            var messages = new List<Message>();
-            if(userId != null)
+            IQueryable<Message> messages = null;
+            if (userId != null)
             {
 
-                messages = db.Message.Include(u => u.FromUser).Where(m => m.ToUserId == userId && m.StatusId == 1).ToList();
-                    
+                messages = db.Message.Include(u => u.FromUser).Where(m => m.ToUserId == userId && m.StatusId == 1);
+
+            }
+            return messages;
+        }
+        public static IEnumerable<Message> GetUserSentMessages(this UserManager<ApplicationUser> userManager, ApplicationUser user, GoSocialContext db)
+        {
+            var userId = user.Id;
+            IQueryable<Message> messages = null;
+            if (userId != null)
+            {
+
+                messages = db.Message.Include(u => u.FromUser).Where(m => m.FromUserId == userId && (m.StatusId == 1 || m.StatusId == 2));
+
+            }
+            return messages;
+        }
+        public static IEnumerable<Message> GetUserArchivedMessages(this UserManager<ApplicationUser> userManager, ApplicationUser user, GoSocialContext db)
+        {
+            var userId = user.Id;
+            IQueryable<Message> messages = null;
+            if (userId != null)
+            {
+
+                messages = db.Message.Include(u => u.FromUser).Where(m => m.ToUserId == userId && (m.StatusId == 3));
+
             }
             return messages;
         }

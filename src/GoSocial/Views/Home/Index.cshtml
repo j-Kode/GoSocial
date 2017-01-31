@@ -1,4 +1,6 @@
-﻿@model IEnumerable<GoSocial.Models.Posting>
+﻿@using PagedList.Core;
+@using PagedList.Core.Mvc;
+@model IPagedList<GoSocial.Models.Posting>
 @{
     ViewData["Title"] = "Home Page";
     Layout = "";
@@ -15,12 +17,15 @@
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/custom.css" />
+        <link rel="stylesheet" href="~/css/hover.min.css" asp-append-version="true" />
     </environment>
     <environment names="Staging,Production">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.6/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/hover.min.css" asp-append-version="true" />
     </environment>
     <environment names="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
@@ -39,6 +44,7 @@
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="~/css/font-awesome.min.css" />
     @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
 </head>
 <body>
@@ -58,7 +64,6 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="AddCampaign">Start Campaign</a></li>
-                    <li><a asp-area="" asp-controller="Message" asp-action="Index">Inbox</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                 </ul>
@@ -113,7 +118,7 @@
                         return false;
                     }
                 });
-            
+
             $('#contactModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget) // Button that triggered the modal
                 var recipient = button.data('whatever') // Extract info from data-* attributes
@@ -135,40 +140,113 @@
             </div>
         </div>
         <div class="row">
+            <pager class="pager-container" list="@Model" options="@PagedListRenderOptions.OnlyShowFivePagesAtATime" asp-action="Index" asp-controller="Home" />
             @foreach (var posting in Model)
             {
-                <div class="col-sm-12 Posting" data-toggle="collapse" data-parent="#accordion" href="#Collapse-@Html.DisplayFor(x => posting.Id)" aria-expanded="true">
-                    <div class="col-sm-7">
-                        <div class="row postingTitle">@Html.DisplayFor(x => posting.Title)</div>
-                        <div class="row">@Html.DisplayFor(x => posting.Description)</div>
+                <div class="col-xs-12 Posting hvr-underline-reveal" data-toggle="collapse" data-parent="#accordion" href="#Collapse-@Html.DisplayFor(x => posting.Id)" aria-expanded="true">
+                        <div class="col-xs-7">
+                            <div class="row postingTitle">@Html.DisplayFor(x => posting.Title)</div>
+                            <div class="row">@Html.DisplayFor(x => posting.Description)</div>
 
-                    </div>
-                    <div class="col-sm-3">
-                        @Html.DisplayFor(x => posting.City.City1)
-                    </div>
-                    <div class="col-sm-1">@Html.DisplayFor(x => posting.Date)</div>
-                    <div class="col-sm-1">@Html.DisplayFor(x => posting.Price)</div>
-
-                </div>
-                <div class="col-sm-12 panel-collapse collapse Details" id="Collapse-@Html.DisplayFor(x => posting.Id)" role="tabpanel" aria-labelledby="headingOne">
-                    <div class="row">
-                        <div class="col-sm-6 text-center">
-                            <h4><b>@Html.DisplayFor(x => posting.Title)</b></h4>
                         </div>
-                        <div class="col-sm-6 text-center"><h4><b>Contact Stuff</b></h4></div>
+                        <div class="col-xs-3">
+                            @Html.DisplayFor(x => posting.City.City1)
+                        </div>
+                        <div class="col-xs-1">
+                            @if (posting.TimeDifference.TotalMinutes < 1)
+                        {
+                        @Html.DisplayFor(x => posting.TimeDifference.Seconds); @: secs ago
+
+                        }
+                        else if (posting.TimeDifference.TotalHours < 1)
+                        {
+                        @Html.DisplayFor(x => posting.TimeDifference.Minutes); @: mins ago
+
+                        }
+                        else if (posting.TimeDifference.TotalHours < 24)
+                        {
+                            var hours = posting.TimeDifference.Hours;
+                            if (hours < 2)
+                            {
+                        @:last hour
+                            }
+                            else
+                            {
+                        @Html.DisplayFor(x => posting.TimeDifference.Hours); @: hrs ago
+                            }
+                        }
+                        else if (posting.TimeDifference.TotalHours < 168)
+                        {
+                            var days = posting.TimeDifference.Days;
+                            if (days < 2)
+                            {
+                        @:yesterday
+                            }
+                            else
+                            {
+                        @Html.DisplayFor(x => posting.TimeDifference.Days); @: days ago
+                            }
+                        }
+                        else if (posting.TimeDifference.TotalHours < 730)
+                        {
+                            var weeks = posting.TimeDifference.Days / 7;
+                            if (weeks < 2)
+                            {
+                        @:Last week
+                            }
+                            else
+                            {
+                        @weeks @: weeks ago
+                            }
+                        }
+                        else if (posting.TimeDifference.TotalHours < 8760)
+                        {
+                            var months = posting.TimeDifference.Days / 30;
+                            if (months < 2)
+                            {
+                        @: Last month
+                            }
+                            else
+                            {
+                        @months @: months ago
+                            }
+                        }
+                        else
+                        {
+                            var years = posting.TimeDifference.Days / 365;
+                            if (years == 1)
+                            {
+                        @:Last year
+                            }
+                            else
+                            {
+                        @years @: years ago
+                                }
+                        }
+                        </div>
+                        <div class="col-xs-1">$@Html.DisplayFor(x => posting.Price)</div>
+
                     </div>
-                    <div class="row PostingAdditionalDetails">
-                        <div class="col-sm-3"><h4>Platform</h4>@Html.DisplayFor(x => posting.PlatformId)</div>
-                        <div class="col-sm-3"><h4>Email</h4></div>
-                        <div class="col-sm-3"><h4>Posted</h4>@Html.DisplayFor(x => posting.Date)</div>
-                        <div class="col-sm-3"><h4>Followers</h4></div>
+                    <div class="col-xs-12 panel-collapse collapse Details" id="Collapse-@Html.DisplayFor(x => posting.Id)" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="row">
+                            <div class="col-xs-6 text-center">
+                                <h4><b>@Html.DisplayFor(x => posting.Title)</b></h4>
+                            </div>
+                            <div class="col-xs-6 text-center"><h4><b>Contact Stuff</b></h4></div>
+                        </div>
+                        <div class="row PostingAdditionalDetails">
+                            <div class="col-xs-3"><h4>Platform</h4>@Html.DisplayFor(x => posting.PlatformId)</div>
+                            <div class="col-xs-3"><h4>Email</h4></div>
+                            <div class="col-xs-3"><h4>Posted</h4>@Html.DisplayFor(x => posting.Date)</div>
+                            <div class="col-xs-3"><h4>Followers</h4></div>
+                        </div>
+                        <div class="row PostingAdditionalDetails">
+                            <div class="col-xs-8"><h4>Description</h4>@Html.DisplayFor(x => posting.Description)</div>
+                            <div class="col-xs-4 text-right"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#contactModal" data-whatever="@@@Html.DisplayFor(x => posting.User.UserName)">Contact @@@Html.DisplayFor(x => posting.User.UserName)</button></div>
+                        </div>
                     </div>
-                    <div class="row PostingAdditionalDetails">
-                        <div class="col-sm-8"><h4>Description</h4>@Html.DisplayFor(x => posting.Description)</div>
-                        <div class="col-sm-4 text-right"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#contactModal" data-whatever="@@@Html.DisplayFor(x => posting.User.UserName)">Contact @@@Html.DisplayFor(x => posting.User.UserName)</button></div>
-                    </div>
-                </div>
             }
+            <pager class="pager-container" list="@Model" options="@PagedListRenderOptions.OnlyShowFivePagesAtATime" asp-action="Index" asp-controller="Home" />
         </div>
         <div class="row">
             @Html.Partial("Modals")

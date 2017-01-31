@@ -13,6 +13,7 @@ using GoSocial.Data;
 using GoSocial.Models;
 using GoSocial.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace GoSocial
 {
@@ -65,7 +66,9 @@ namespace GoSocial
             {
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
                 options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Cookies.ApplicationCookie.LoginPath = "//Account/Register";
             });
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

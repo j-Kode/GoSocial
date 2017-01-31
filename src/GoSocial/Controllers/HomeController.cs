@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using PagedList.Core;
 
 namespace GoSocial.Controllers
 {
@@ -17,6 +18,7 @@ namespace GoSocial.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private GoSocialContext db;
+        private int _pageSize = 15;
 
         public HomeController(
             UserManager<ApplicationUser> userManager, GoSocialContext db)
@@ -26,27 +28,37 @@ namespace GoSocial.Controllers
         }
 
         [Authorize]
-        public IActionResult Index(int IndustryId, int cityId)
+        public IActionResult Index(int IndustryId, int cityId, int? page)
         {
+            var pageNumber = page ?? 1;
             if (IndustryId != 0 && cityId != 0)
             {
-                return View(db.Posting.Include(c => c.City).Include(u => u.User).Where(p=> p.IndustryId == IndustryId && p.CityId == cityId).ToList());
+                return View(db.Posting.Include(c => c.City).Include(u => u.User).Where(p => p.IndustryId == IndustryId && p.CityId == cityId).OrderByDescending(x => x.Date).ToPagedList(pageNumber, _pageSize));
             }
             else
             {
-                return View(db.Posting.Include(c => c.City).Include(u => u.User).ToList());
+                return View(db.Posting.Include(c => c.City).Include(u => u.User).OrderByDescending(x => x.Date).ToPagedList(pageNumber, _pageSize));
             }
 
-            
+
 
         }
         [HttpGet]
         public ActionResult Search(string term)
         {
-            var result = (from c in db.City join s in db.State
-                          on c.StateId equals s.Id where c.City1.StartsWith(term)
-                          select new { label = c.City1 + ", " + s.StateCode, value=c.Id }).Take(10).ToList();
+            var result = (from c in db.City
+                          join s in db.State
+        on c.StateId equals s.Id
+                          where c.City1.StartsWith(term)
+                          select new { label = c.City1 + ", " + s.StateCode, value = c.Id }).Take(10).ToList();
             return Json(result);
+        }
+        [HttpGet]
+        public ActionResult CheckUserName(string username)
+        {
+            var exists = db.Users.Where(u => u.UserName == username).FirstOrDefault();
+
+            return Json(exists);
         }
         public IActionResult About()
         {
@@ -83,7 +95,7 @@ namespace GoSocial.Controllers
                 message.StatusId = 1;
                 db.Message.Add(message);
                 db.SaveChanges();
-                
+
                 return RedirectToAction("Index");
             }
             return View();
@@ -94,45 +106,45 @@ namespace GoSocial.Controllers
         {
             if (ModelState.IsValid)
             {
-                    posting.Date = DateTime.UtcNow;
-                    posting.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value; //Added 1 for userid, testing purpose.
-                    db.Posting.Add(posting);
-                    db.SaveChanges();
+                posting.Date = DateTime.UtcNow;
+                posting.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value; //Added 1 for userid, testing purpose.
+                db.Posting.Add(posting);
+                db.SaveChanges();
 
-                    return RedirectToAction("Index");
+                return RedirectToAction("Index");
             }
             return View(posting);
         }
         [HttpGet]
         public JsonResult GetStates(int countryId)
         {
-                var states = (from s in db.State
-                              where s.CountryId == countryId
-                              select
-                               new SelectListItem
-                               {
-                                   Value = s.Id.ToString(),
-                                   Text = s.State1
+            var states = (from s in db.State
+                          where s.CountryId == countryId
+                          select
+                           new SelectListItem
+                           {
+                               Value = s.Id.ToString(),
+                               Text = s.State1
 
-                               }).ToList();
+                           }).ToList();
 
-                return Json(states);
-                 }
+            return Json(states);
+        }
 
         [HttpGet]
         public JsonResult GetCities(int stateId)
         {
-                var cities = (from c in db.City
-                              where c.StateId == stateId
-                              select
-                              new SelectListItem
-                              {
-                                  Value = c.Id.ToString(),
-                                  Text = c.City1
-                              }).ToList();
+            var cities = (from c in db.City
+                          where c.StateId == stateId
+                          select
+                          new SelectListItem
+                          {
+                              Value = c.Id.ToString(),
+                              Text = c.City1
+                          }).ToList();
 
-                return Json(cities);
-         
+            return Json(cities);
+
         }
         //private Task<ApplicationUser> GetCurrentUserAsync()
         //{

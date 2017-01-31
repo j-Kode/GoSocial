@@ -7,6 +7,8 @@ namespace GoSocial.Models
     {
         public int Id { get; set; }
         public string UserId { get; set; }
+
+
         public DateTime Date { get; set; }
         public int CityId { get; set; }
         public string Description { get; set; }
@@ -21,5 +23,13 @@ namespace GoSocial.Models
 
         public virtual City City { get; set; }
         public virtual ApplicationUser User { get; set; }
+
+        public TimeSpan TimeDifference
+        {
+            get
+            {
+                return (DateTime.UtcNow - this.Date);
+            }
+        }
     }
 }

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Identity;
 using GoSocial.Models;
 using GoSocial.Models.MessageViewModels;
 using GoSocial.Helpers;
+using Microsoft.EntityFrameworkCore;
+using PagedList.Core;
 
 namespace GoSocial.Controllers
 {
@@ -16,6 +18,7 @@ namespace GoSocial.Controllers
         private GoSocialContext db;
 
         private readonly UserManager<ApplicationUser> _userManager;
+        const int _pageSize = 10;
 
         public MessageController(UserManager<ApplicationUser> userManager, GoSocialContext db)
         {
@@ -23,25 +26,61 @@ namespace GoSocial.Controllers
             _userManager = userManager;
         }
         // GET: Message
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
-
+            int pageNumber = page ?? 1;
             var user = await GetCurrentUserAsync();
             if (user == null)
             {
                 return View("Error");
             }
-            var model = new IndexMessagesViewModel
-            {
-                Messages = _userManager.GetUserMessages(user, db)
-            };
+            var model = _userManager.GetUserMessages(user, db);
 
-            return View(model);
+            return View(model.ToPagedList(pageNumber, _pageSize));
+        }
+        public async Task<ActionResult> Received(int? page)
+        {
+            int pageNumber = page ?? 1;
+            var user = await GetCurrentUserAsync();
+            if (user == null)
+            {
+                return View("Error");
+            }
+            var messages = _userManager.GetUserMessages(user, db);
+            return PartialView("~/Views/Message/Received.cshtml", messages.ToPagedList(pageNumber, _pageSize));
+        }
+        public async Task<ActionResult> Archived(int? page)
+        {
+            int pageNumber = page ?? 1;
+            var user = await GetCurrentUserAsync();
+            if (user == null)
+            {
+                return View("Error");
+            }
+            var messages = _userManager.GetUserArchivedMessages(user, db);
+            return PartialView("~/Views/Message/Archived.cshtml", messages.ToPagedList(pageNumber, _pageSize));
         }
         // GET: Message/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(int messageId)
         {
-            return View();
+            var message = db.Message.Include(x => x.FromUser).Where(m => m.MessageId == messageId).FirstOrDefault();
+
+
+            return PartialView("~/Views/Message/Details.cshtml", message);
+        }
+
+        public async Task<ActionResult> Sent(int? page)
+        {
+            int pageNumber = page ?? 1;
+            var user = await GetCurrentUserAsync();
+            if (user == null)
+            {
+                return View("Error");
+            }
+            var sentMessages = _userManager.GetUserSentMessages(user, db);
+
+
+            return PartialView("~/Views/Message/Sent.cshtml", sentMessages.ToPagedList(pageNumber, _pageSize));
         }
 
         // GET: Message/Create
@@ -49,7 +88,6 @@ namespace GoSocial.Controllers
         {
             return View();
         }
-
         // POST: Message/Create
         [HttpPost]
         [ValidateAntiForgeryToken]

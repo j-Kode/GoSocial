@@ -172,6 +172,10 @@ namespace GoSocial.Models
 
                 b.Property<string>("UserName")
                     .HasAnnotation("MaxLength", 256);
+                b.Property<DateTime?>("CreateDate");
+
+                b.Property<string>("InstagramUsername")
+                   .HasAnnotation("MaxLength", 100);
 
                 b.HasKey("Id");
 

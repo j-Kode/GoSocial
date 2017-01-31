@@ -3,7 +3,26 @@
 	background-color: #fbfbfc;
     
 }
+#landingPageBody{
+    background:url(/images/ComputerTyping.jpeg) no-repeat;
+    -webkit-background-size: cover !important;
+    -moz-background-size: cover !important;
+    -o-background-size: cover !important;
+    background-size: cover !important;
+}
 
+.landingPageContainer{
+    background: rgba(0, 0, 0, 0.42) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100vh;
+    min-height: 1000px
+}
+.landingPageBodyContent{
+    padding-top:10%;
+}
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
@@ -65,9 +84,12 @@ textarea {
 	cursor:pointer;
 	background-color: #fff;
 	border-bottom: 2px solid #e8eaf1;
-	border-radius: 5px;
 	color: #000000;
 	height: 120px;
+}
+.Posting:hover{
+    transition:background-color 0.3s;
+    background-color: #efefef;
 }
 .Posting > div{
 	height:inherit;
@@ -194,6 +216,8 @@ legend{
   margin-bottom: 20px;
   padding-left: 0; 
   text-align:left;
+  position:absolute;
+  width:100%;
 }
 .ui-helper-hidden-accessible { position: absolute; left:-999em; }
 .form-control{
@@ -210,4 +234,21 @@ legend{
 }
 #postingSearch > .form-group{
     padding:0;
+}
+#registerForm{
+
+    background-color:#fff;
+    border: 1px solid #fff;
+    border-radius:2px;
+    padding: 10px 35px;
+}
+
+#registerForm input{
+    border-radius: 2px;
+    box-shadow:none;
+    height:45px
+}
+
+#registerForm input::-webkit-input-placeholder {
+    color:#a9a9a9;
 }

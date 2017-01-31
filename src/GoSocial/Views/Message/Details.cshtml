@@ -1,0 +1,25 @@
+﻿@model GoSocial.Models.Message
+
+
+<div class="card">
+    <div class="card-header form-inline">
+        <h6 class="text-muted col-sm-8">From: @Html.DisplayFor(m => Model.FromUser.UserName)</h6>
+        <h6 class="text-muted col-sm-4 text-right">Received on: @Html.DisplayFor(m => Model.CreateDate)</h6>
+    </div>
+    <div class="card-block">
+        <h4 class="card-title">@Html.DisplayFor(m => Model.MessageSubject)</h4>
+    </div>
+    <div class="card-block">
+        <p class="card-text">@Html.DisplayFor(m => Model.MessageText)</p>
+        @*<a href="#" class="card-link">Card link</a>
+            <a href="#" class="card-link">Another link</a>*@
+    </div>
+    <div class="card-footer text-muted form-inline">
+        <div class="col-sm-6">
+            <a href="/Message/" type="button" class="btn-sm btn btn-primary col-sm-2 pull-left"><i class="fa fa-level-down fa-rotate-90" aria-hidden="true"></i></a>
+        </div>
+        <div class="col-sm-6">
+            @Html.ActionLink("Archive", "Delete", "Message", Model, new { @class = "btn btn-warning btn-sm pull-right" })
+        </div>
+    </div>
+</div>

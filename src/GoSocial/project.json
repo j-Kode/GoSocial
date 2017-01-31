@@ -46,19 +46,16 @@
       "type": "build"
     },
     "Microsoft.EntityFrameworkCore": "1.0.1",
-    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.1",
-    "Microsoft.EntityFrameworkCore.Tools": "1.0.0-preview2-final",
-    "Microsoft.EntityFrameworkCore.SqlServer.Design": "1.0.1",
     "System.ComponentModel.Annotations": "4.1.0",
     "Microsoft.AspNetCore.Identity": "1.0.0",
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Facebook": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Google": "1.0.0",
     "Microsoft.AspNetCore.Authentication.Twitter": "1.0.0",
     "SendGrid.NetCore": "1.0.0-rtm-00002",
     "MailKit": "1.8.1",
     "Twilio": "5.0.0-rc8",
-    "AspNet.Security.OAuth.Instagram": "1.0.0-beta1-final"},
+    "AspNet.Security.OAuth.Instagram": "1.0.0-beta1-final",
+    "PagedList.Core.Mvc": "1.0.1"},
 
   "tools": {
     "BundlerMinifier.Core": "2.0.238",

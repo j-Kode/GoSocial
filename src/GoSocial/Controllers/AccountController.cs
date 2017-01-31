@@ -10,6 +10,8 @@ using GoSocial.Models;
 using GoSocial.Models.AccountViewModels;
 using GoSocial.Services;
 using GoSocial.Helpers;
+using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace GoSocial.Controllers
 {
@@ -22,19 +24,22 @@ namespace GoSocial.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private GoSocialContext db;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            GoSocialContext db)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
+            this.db = db;
         }
 
         //
@@ -46,7 +51,18 @@ namespace GoSocial.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
-
+        [AllowAnonymous]
+        public async Task<JsonResult> CheckUserNameAsync(string username)
+        {
+            var result = await _userManager.FindByNameOrEmailAsync(username);
+            return Json(result == null);
+        }
+        [AllowAnonymous]
+        public async Task<JsonResult> CheckEmailAsync(string Email)
+        {
+            var result = await _userManager.FindByEmailAsync(Email);
+            return Json(result == null);
+        }
         //
         // POST: /Account/Login
         [HttpPost]
@@ -115,27 +131,33 @@ namespace GoSocial.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email };
-                var userWithSameEmail = _userManager.FindByEmailAsync(model.Email);
-                if (userWithSameEmail.Result == null)
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, CreateDate = DateTime.UtcNow, InstagramUsername = model.InstagramUsername };
+                var userWithSameEmail = _userManager.FindByNameOrEmailAsync(model.Email);
+                var userWithSameUsername = _userManager.UsernameInUse(model.Username);
+                if (userWithSameUsername.Result == null)
                 {
-                    var result = await _userManager.CreateAsync(user, model.Password);
-                    if (result.Succeeded)
+                    if (userWithSameEmail.Result == null)
                     {
-                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                        // Send an email with this link
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                        await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
-                        //await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation(3, "User created a new account with password.");
-                        return RedirectToLocal(returnUrl);
+                        var result = await _userManager.CreateAsync(user, model.Password);
+                        if (result.Succeeded)
+                        {
+                            // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+                            // Send an email with this link
+                            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                            await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
+                                $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                            //await _signInManager.SignInAsync(user, isPersistent: false);
+                            _logger.LogInformation(3, "User created a new account with password.");
+                            return RedirectToLocal(returnUrl);
+                        }
+                        AddErrors(result);
                     }
-                    AddErrors(result);
+                    else
+                        ModelState.AddModelError(string.Empty, "That email is already in use");
                 }
                 else
-                    ModelState.AddModelError(string.Empty, "That email is already in use");
+                    ModelState.AddModelError(string.Empty, "That username is already in use");
             }
 
             // If we got this far, something failed, redisplay form

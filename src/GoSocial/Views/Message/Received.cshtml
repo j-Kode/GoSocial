@@ -1,0 +1,42 @@
+﻿@using PagedList.Core;
+@using PagedList.Core.Mvc;
+@model IPagedList<GoSocial.Models.Message>
+    <div class="row">
+        <div class="col-xs-12 spacer5"></div>
+    </div><!--/row-->
+    <!--/inbox toolbar-->
+    <div class="panel panel-default inbox" id="inboxPanel">
+        <!--message list-->
+        <div class="table-responsive">
+            <table class="table table-hover refresh-container pull-down">
+                <thead class="hidden-xs">
+                    <tr>
+                        <td class="col-sm-3"><a href="javascript:;"><strong>From</strong></a></td>
+                        <td class="col-sm-2"><a href="javascript:;"><strong>Title</strong></a></td>
+                        <td class="col-sm-4"><a href="javascript:;"><strong>Recieved</strong></a></td>
+                        <td class="col-sm-1"></td>
+                    </tr>
+                </thead>
+
+                <tbody id="messageInfo">
+                    @foreach (var message in Model)
+                    {
+                        <tr class="InboundMessage" id=@message.MessageId style="cursor:pointer">
+
+                            <td class="col-xs-4"><span>@Html.DisplayFor(x => message.FromUser.UserName)</span></td>
+                            <td class="col-xs-5"><span>@Html.DisplayFor(x => message.MessageSubject)</span></td>
+                            <td class="col-xs-2"><span>@Html.DisplayFor(x => message.CreateDate)</span></td>
+                            <td class="col-xs-1">@Html.ActionLink("Archive", "Delete", "Message", message, new { @class = "btn btn-warning btn-sm" })</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+            <div id="messageDetails"></div>
+        </div>
+        <!--message detail-->
+    </div><!--/inbox panel-->
+    <pager class="pager-container" list="@Model" options="@PagedListRenderOptions.OnlyShowFivePagesAtATime" asp-action="Index" asp-controller="Message" />
+    <hr>
+
+
