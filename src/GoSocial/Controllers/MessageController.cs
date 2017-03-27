@@ -10,6 +10,7 @@ using GoSocial.Models.MessageViewModels;
 using GoSocial.Helpers;
 using Microsoft.EntityFrameworkCore;
 using PagedList.Core;
+using System.Security.Claims;
 
 namespace GoSocial.Controllers
 {
@@ -83,79 +84,48 @@ namespace GoSocial.Controllers
             return PartialView("~/Views/Message/Sent.cshtml", sentMessages.ToPagedList(pageNumber, _pageSize));
         }
 
-        // GET: Message/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-        // POST: Message/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Message/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Message/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Message/Delete/5
-        public ActionResult Delete(Message message)
+        public ActionResult Archive(Message message)
         {
             message.StatusId = 3; //Setting message state to deleted, maybe this shouldnt be hardcoded
             db.Entry(message).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             db.SaveChanges();
             return RedirectToAction("index");
         }
-
-        // POST: Message/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(Message message)
         {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+            message.StatusId = 4; //Permanetly deleting message but still keeping it
+            db.Entry(message).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            db.SaveChanges();
+            return RedirectToAction("index");
+        }
+        // POST: Message/Delete/5
+        public ActionResult Restore(Message message)
+        {
+            message.StatusId = 2; //Permanetly deleting message but still keeping it
+            db.Entry(message).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            db.SaveChanges();
+            return RedirectToAction("index");
         }
         private Task<ApplicationUser> GetCurrentUserAsync()
         {
             return _userManager.GetUserAsync(HttpContext.User);
+        }
+        public IActionResult ReplyMessage(Message message)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var user = db.Users.Where(u => u.UserName == message.ToUserId.Substring(1)).FirstOrDefault();
+                message.CreateDate = DateTime.UtcNow;
+                message.FromUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                message.ToUserId = user.Id;
+                message.StatusId = 1;
+                db.Message.Add(message);
+                db.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+            return View();
         }
     }
 }

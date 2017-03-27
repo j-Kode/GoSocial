@@ -1,4 +1,9 @@
-﻿@model GoSocial.Models.Message
+﻿@using PagedList.Core;
+@using PagedList.Core.Mvc;
+@model IPagedList<GoSocial.Models.Message>
+@{
+    ViewData["Title"] = "My Messages";
+}
    <div class="row">
         <div class="col-xs-12">
             <a class="btn btn-default" data-toggle="tooltip" title="Refresh" id="refreshInbox" href="javascript:;">
@@ -31,14 +36,14 @@
                 </thead>
 
                 <tbody id="messageInfo">
-                    @foreach (var message in Model.Messages)
+                    @foreach (var message in Model)
                     {
                         <tr class="InboundMessage" id=@message.MessageId style="cursor:pointer">
 
                             <td class="col-sm-3 col-xs-4"><span>@Html.DisplayFor(x => message.FromUser.UserName)</span></td>
                             <td class="col-sm-2 col-xs-4"><span>@Html.DisplayFor(x => message.MessageSubject)</span></td>
                             <td class="col-sm-4 col-xs-6"><span>@Html.DisplayFor(x => message.CreateDate)</span></td>
-                            <td class="col-sm-1 col-sm-2">@Html.ActionLink("Archive", "Delete", "Message", message, new { @class = "btn btn-warning btn-sm" })</td>
+                            <td class="col-sm-1 col-sm-2">@Html.ActionLink("Archive", "Archive", "Message", message, new { @class = "btn btn-warning btn-sm" })</td>
                         </tr>
                     }
 

@@ -35,7 +35,7 @@ namespace GoSocial.Helpers
             if (userId != null)
             {
 
-                messages = db.Message.Include(u => u.FromUser).Where(m => m.ToUserId == userId && m.StatusId == 1);
+                messages = db.Message.Include(u => u.FromUser).Where(m => m.ToUserId == userId && m.StatusId == 1).OrderByDescending(x => x.CreateDate);
 
             }
             return messages;
@@ -47,7 +47,7 @@ namespace GoSocial.Helpers
             if (userId != null)
             {
 
-                messages = db.Message.Include(u => u.FromUser).Where(m => m.FromUserId == userId && (m.StatusId == 1 || m.StatusId == 2));
+                messages = db.Message.Include(u => u.FromUser).Where(m => m.FromUserId == userId && (m.StatusId == 1 || m.StatusId == 2)).OrderByDescending(x => x.CreateDate);
 
             }
             return messages;
@@ -59,7 +59,7 @@ namespace GoSocial.Helpers
             if (userId != null)
             {
 
-                messages = db.Message.Include(u => u.FromUser).Where(m => m.ToUserId == userId && (m.StatusId == 3));
+                messages = db.Message.Include(u => u.FromUser).Where(m => m.ToUserId == userId && (m.StatusId == 3)).OrderByDescending(x => x.CreateDate);
 
             }
             return messages;

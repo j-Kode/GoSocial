@@ -5,6 +5,17 @@
     ViewData["Title"] = "My Messages";
 }
 @section scripts{
+     $('#replyModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget) // Button that triggered the modal
+                var recipient = button.data('recipient') // Extract info from data-* attributes
+                var subject = button.data('subject')
+                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+                var modal = $(this)
+                modal.find('.modal-title').text('New message to ' + recipient)
+                modal.find('#recipient-name').val(recipient)
+                modal.find('#message-subject').val("Re:" + subject)
+            });
     $(document).on("click", ".InboundMessage", function(e){
     var messageId = e.currentTarget.id;
     $("#messageContainer").empty();
@@ -88,7 +99,7 @@
                                     <td class="col-xs-4"><span>@Html.DisplayFor(x => message.FromUser.UserName)</span></td>
                                     <td class="col-xs-5"><span>@Html.DisplayFor(x => message.MessageSubject)</span></td>
                                     <td class="col-xs-2"><span>@Html.DisplayFor(x => message.CreateDate)</span></td>
-                                    <td class="col-sm-1">@Html.ActionLink("Archive", "Delete", "Message", message, new { @class = "btn btn-warning btn-sm" })</td>
+                                    <td class="col-sm-1">@Html.ActionLink("Archive", "Archive", "Message", message, new { @class = "btn btn-warning btn-sm" })</td>
                                 </tr>
                             }
 
@@ -102,10 +113,9 @@
             <hr>
 
         </div><!--/col-9-->
-        <div>
-            <!--/row ng-controller-->
-
-        </div><!--/container-->
+        <div class="row">
+            @Html.Partial("Modals")
+        </div>
 
     </div>
 

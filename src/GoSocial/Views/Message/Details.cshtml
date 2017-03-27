@@ -15,11 +15,13 @@
             <a href="#" class="card-link">Another link</a>*@
     </div>
     <div class="card-footer text-muted form-inline">
-        <div class="col-sm-6">
-            <a href="/Message/" type="button" class="btn-sm btn btn-primary col-sm-2 pull-left"><i class="fa fa-level-down fa-rotate-90" aria-hidden="true"></i></a>
+        <div class="col-sm-1">
+            <a href="/Message/" type="button" class="btn-sm btn btn-primary pull-left col-sm-12"><i class="fa fa-level-down fa-rotate-90" aria-hidden="true"></i></a>
+            </div><div class="col-sm-5">
+            <button type="button" class="btn-sm btn btn-primary pull-left" data-toggle="modal" data-target="#replyModal" data-subject="@Model.MessageSubject" data-recipient="@@@Html.DisplayFor(x => Model.FromUser.UserName)">Reply To @@@Html.DisplayFor(x => Model.FromUser.UserName)</button>
         </div>
         <div class="col-sm-6">
-            @Html.ActionLink("Archive", "Delete", "Message", Model, new { @class = "btn btn-warning btn-sm pull-right" })
+            @Html.ActionLink("Archive", "Archive", "Message", Model, new { @class = "btn btn-warning btn-sm pull-right" })
         </div>
     </div>
 </div>

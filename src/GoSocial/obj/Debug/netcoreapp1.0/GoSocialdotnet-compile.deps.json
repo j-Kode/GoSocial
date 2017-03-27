@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v1.0/",
-    "signature": "dfe45071e64530a36a81b0b6de28c0c3102f9d0b"
+    "signature": "581959078c7a62bc0a9a3c8ec75d5e95e30a5940"
   },
   "compilationOptions": {
     "defines": [
@@ -46,7 +46,8 @@
           "MailKit": "1.8.1",
           "Twilio": "5.0.0-rc8",
           "AspNet.Security.OAuth.Instagram": "1.0.0-beta1-final",
-          "PagedList.Core.Mvc": "1.0.1"
+          "PagedList.Core.Mvc": "1.0.1",
+          "jquery.TypeScript.DefinitelyTyped": "3.1.2"
         },
         "compile": {
           "GoSocial.dll": {}
@@ -60,6 +61,7 @@
           "lib/netstandard1.3/AspNet.Security.OAuth.Instagram.dll": {}
         }
       },
+      "jquery.TypeScript.DefinitelyTyped/3.1.2": {},
       "Libuv/1.9.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1"
@@ -3158,7 +3160,8 @@
           "MailKit": "1.8.1",
           "Twilio": "5.0.0-rc8",
           "AspNet.Security.OAuth.Instagram": "1.0.0-beta1-final",
-          "PagedList.Core.Mvc": "1.0.1"
+          "PagedList.Core.Mvc": "1.0.1",
+          "jquery.TypeScript.DefinitelyTyped": "3.1.2"
         },
         "runtime": {
           "GoSocial.dll": {}
@@ -3172,6 +3175,7 @@
           "lib/netstandard1.3/AspNet.Security.OAuth.Instagram.dll": {}
         }
       },
+      "jquery.TypeScript.DefinitelyTyped/3.1.2": {},
       "Libuv/1.9.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1"
@@ -6137,6 +6141,11 @@
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-D5Wxls0JBbwi1SCEb4Jy6nqZelFuwJNW7voWjQD74BgHCFBegmDeNN060A1e90CAugbCMVBuadbs5naHgq2btg=="
+    },
+    "jquery.TypeScript.DefinitelyTyped/3.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-km6S6ElHdLPBxNf1qj5vQjkw1rpRe5Hwf/1aFo5TZtl3ZSfc//lcdsVTfPZz78o+/dkhEC+ZJcRONNlVDAJg6A=="
     },
     "Libuv/1.9.0": {
       "type": "package",
