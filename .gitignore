@@ -2,3 +2,7 @@
 \.vs/
 
 Backup/
+
+src/GoSocial/bin/
+
+src/GoSocial/obj/
